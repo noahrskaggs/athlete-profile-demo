@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#a6e82c">
+<meta name="theme-color" content="#ffffff">
 <meta property="og:title" content="Recruiting Profile — Athlete Narrative">
 <meta property="og:description" content="Tap the stat cells to expand. Switch schools to see it re-theme.">
 <title>Recruiting Profile — School-Themed Cells + Buttons</title>
@@ -49,15 +49,16 @@
   --r:20px; }
 
 *{box-sizing:border-box;}
-/* Athlete Narrative signature green behind the interface (with subtle paint streaks) */
-body{ margin:0;
-  background:
-    linear-gradient(118deg, transparent 44%, rgba(255,255,255,.16) 46%, transparent 49%),
-    linear-gradient(122deg, transparent 63%, rgba(0,0,0,.06) 65%, transparent 68%),
-    radial-gradient(140% 90% at 50% -20%, #c4ff3d 0%, #a6e82c 48%, #8ccf22 100%);
-  background-attachment:fixed;
+/* White canvas with Athlete Narrative green paint streaks framing the edges (like the original) */
+body{ margin:0; background:#ffffff;
   color:var(--text); font-family:"Archivo",system-ui,-apple-system,"Segoe UI",sans-serif;
-  -webkit-font-smoothing:antialiased; line-height:1.5; padding:20px 16px 70px; }
+  -webkit-font-smoothing:antialiased; line-height:1.5; padding:22px 34px 70px; }
+.paint{ position:fixed; top:0; bottom:0; width:16vw; min-width:70px; max-width:200px; z-index:0; pointer-events:none; }
+.paint.l{ left:0; }
+.paint.r{ right:0; transform:scaleX(-1); }
+.paint svg{ width:100%; height:100%; display:block; }
+/* keep the interface centered and above the paint */
+.switcher, .profile{ position:relative; z-index:1; }
 h1{font-weight:900; letter-spacing:-.025em; line-height:1.03; margin:0;}
 
 /* ---- demo school switcher (delete on integration) ---- */
@@ -88,6 +89,11 @@ h1{font-weight:900; letter-spacing:-.025em; line-height:1.03; margin:0;}
   box-shadow:0 12px 26px rgba(0,0,0,.30), inset 0 0 0 2px rgba(255,255,255,.4);}
 .hero-band .logo-tile .logo{ max-width:100%; max-height:100%; object-fit:contain; display:block; }
 .hero-band .logo-tile .logo-mono{ display:none; font-weight:900; font-size:32px; letter-spacing:-.05em; color:var(--b1-dark); }
+/* faded mascot/logo watermark behind the header */
+.hero-band .hero-wm{ position:absolute; z-index:0; top:-26px; left:50%; width:300px; height:300px;
+  transform:translateX(-50%) rotate(-5deg); object-fit:contain; opacity:.14; pointer-events:none;
+  -webkit-mask-image:radial-gradient(circle at 50% 40%, #000 55%, transparent 78%);
+          mask-image:radial-gradient(circle at 50% 40%, #000 55%, transparent 78%); }
 
 /* Location card with map */
 .loc-card{ background:#fff; border:1px solid color-mix(in srgb,var(--brand-1) 8%,#eee); border-radius:var(--r);
@@ -179,7 +185,12 @@ h1{font-weight:900; letter-spacing:-.025em; line-height:1.03; margin:0;}
 /* compact gauge used inside a stat cell */
 .ring--sm{ width:78px;height:78px; }
 .ring--sm .rnum{ font-size:19px; }
-.gauge{ display:flex; justify-content:center; padding:12px 0 2px; }
+.ring--md{ width:98px;height:98px; }
+.ring--md .rnum{ font-size:30px; }
+.gauge{ display:flex; flex-direction:column; align-items:center; gap:7px; padding:12px 0 4px; }
+/* WHOOP-style score cell: uniform ring + "out of 100" */
+.score .cell-btn{ padding-bottom:16px; }
+.ringsub{ font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:.11em; color:var(--muted); }
 
 /* info rows */
 .rows{ margin:6px 6px; }
@@ -265,6 +276,44 @@ h1{font-weight:900; letter-spacing:-.025em; line-height:1.03; margin:0;}
 </head>
 <body>
 
+<!-- Athlete Narrative paint-streak edges (swap for the real brand paint asset if you have it) -->
+<div class="paint l" aria-hidden="true">
+  <svg viewBox="0 0 200 1000" preserveAspectRatio="xMinYMid slice">
+    <g fill="#a6e82c">
+      <path d="M0,40 C70,70 30,150 78,210 C120,262 44,320 92,392 C132,452 40,512 86,590 C126,658 44,720 96,800 C132,856 60,910 44,1000 L0,1000 Z"/>
+      <path d="M0,0 C40,30 18,90 44,150 L0,150 Z"/>
+    </g>
+    <g fill="#c4ff3d" opacity=".85">
+      <path d="M62,120 c30,44 -18,92 20,150 c34,52 -20,96 16,158 c30,52 -14,96 14,168 c22,56 -8,92 6,150" fill="none" stroke="#c4ff3d" stroke-width="15" stroke-linecap="round"/>
+    </g>
+    <g fill="#8ccf22">
+      <ellipse cx="112" cy="250" rx="9" ry="16" transform="rotate(24 112 250)"/>
+      <ellipse cx="96" cy="470" rx="7" ry="13" transform="rotate(-16 96 470)"/>
+      <ellipse cx="126" cy="660" rx="8" ry="15" transform="rotate(18 126 660)"/>
+      <circle cx="140" cy="360" r="5"/><circle cx="120" cy="560" r="4"/><circle cx="150" cy="820" r="6"/>
+      <circle cx="86" cy="150" r="3.5"/><circle cx="132" cy="930" r="4.5"/>
+    </g>
+  </svg>
+</div>
+<div class="paint r" aria-hidden="true">
+  <svg viewBox="0 0 200 1000" preserveAspectRatio="xMinYMid slice">
+    <g fill="#a6e82c">
+      <path d="M0,80 C66,120 28,190 74,250 C118,308 40,362 88,440 C128,506 44,560 90,640 C130,708 48,772 92,852 C128,910 58,948 42,1000 L0,1000 Z"/>
+      <path d="M0,10 C44,44 20,96 40,150 L0,150 Z"/>
+    </g>
+    <g>
+      <path d="M58,160 c30,46 -18,90 18,150 c32,52 -18,96 14,156 c28,50 -12,92 12,162" fill="none" stroke="#c4ff3d" stroke-width="14" stroke-linecap="round" opacity=".85"/>
+    </g>
+    <g fill="#8ccf22">
+      <ellipse cx="108" cy="300" rx="8" ry="15" transform="rotate(20 108 300)"/>
+      <ellipse cx="124" cy="520" rx="7" ry="13" transform="rotate(-14 124 520)"/>
+      <ellipse cx="98" cy="720" rx="9" ry="16" transform="rotate(22 98 720)"/>
+      <circle cx="138" cy="420" r="5"/><circle cx="118" cy="620" r="4"/><circle cx="146" cy="880" r="5.5"/>
+      <circle cx="90" cy="210" r="3.5"/>
+    </g>
+  </svg>
+</div>
+
 <!-- ===== DEMO ONLY: school color switcher (delete on integration) ===== -->
 <div class="switcher">
   <span class="lbl">School theme</span>
@@ -277,6 +326,8 @@ h1{font-weight:900; letter-spacing:-.025em; line-height:1.03; margin:0;}
 
     <!-- themed banner -->
     <div class="hero-band">
+      <!-- faded mascot/logo watermark behind the header -->
+      <img class="hero-wm" id="schoolWatermark" src="https://a.espncdn.com/i/teamlogos/ncaa/500/13.png" alt="" aria-hidden="true">
       <div class="logo-tile">
         <!-- bind src to the school's logo; monogram shows if it fails to load -->
         <img class="logo" id="schoolLogo" src="https://a.espncdn.com/i/teamlogos/ncaa/500/13.png" alt="School logo">
@@ -316,10 +367,10 @@ h1{font-weight:900; letter-spacing:-.025em; line-height:1.03; margin:0;}
         <div class="cell expandable" style="--d:.02s">
           <button class="cell-btn js-expand" aria-expanded="false"><span class="accent"></span>
             <span class="cell-top"><span class="ico"><svg viewBox="0 0 24 24"><path d="M12 4 2 9l10 5 10-5-10-5Z"/><path d="M6 11v5c0 1 2.7 2.5 6 2.5s6-1.5 6-2.5v-5"/></svg></span><span class="label">GPA</span></span>
-            <span class="gauge"><span class="ring ring--sm" data-pct="100"><svg viewBox="0 0 80 80"><circle class="track" cx="40" cy="40" r="32"/><circle class="prog" cx="40" cy="40" r="32"/></svg><span class="rnum">4.0</span></span></span>
+            <span class="value">4.00</span>
             <span class="toggle"><svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg></span>
           </button>
-          <div class="cell-panel"><div><p class="desc">Average unweighted GPA of admitted students (shown on a 4.0 scale) &mdash; a benchmark for where you&rsquo;ll be a competitive academic applicant.</p></div></div>
+          <div class="cell-panel"><div><p class="desc">Average unweighted GPA of admitted students &mdash; a benchmark for where you&rsquo;ll be a competitive academic applicant.</p></div></div>
         </div>
 
         <div class="cell expandable" style="--d:.06s">
@@ -355,26 +406,22 @@ h1{font-weight:900; letter-spacing:-.025em; line-height:1.03; margin:0;}
       <div class="sec-h"><span class="dot"></span>Recruiting Fit</div>
       <div class="grid">
 
-        <div class="cell expandable hero-cell span2" style="--d:.02s">
+        <div class="cell expandable score" style="--d:.02s">
           <button class="cell-btn js-expand" aria-expanded="false"><span class="accent"></span>
-            <span class="hero-left">
-              <span class="cell-top"><span class="ico"><svg viewBox="0 0 24 24"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8Z"/></svg></span><span class="label">Power Score</span></span>
-              <span class="value">92<span class="unit">/100</span></span>
-              <span class="tagline">Strong fit</span>
-            </span>
-            <span class="ring" data-pct="92"><svg viewBox="0 0 84 84"><circle class="track" cx="42" cy="42" r="36"/><circle class="prog" cx="42" cy="42" r="36"/></svg><span class="rnum">92</span></span>
+            <span class="cell-top"><span class="ico"><svg viewBox="0 0 24 24"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8Z"/></svg></span><span class="label">Power Score</span></span>
+            <span class="gauge"><span class="ring ring--md" data-pct="92"><svg viewBox="0 0 96 96"><circle class="track" cx="48" cy="48" r="40"/><circle class="prog" cx="48" cy="48" r="40"/></svg><span class="rnum">92</span></span><span class="ringsub">out of 100</span></span>
             <span class="toggle"><svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg></span>
           </button>
-          <div class="cell-panel"><div><p class="desc">Our proprietary 0&ndash;100 rating of how strong a fit this program is for you &mdash; blending athletic level, academic match, cost, and roster need into one number. The higher the score, the better the all-around opportunity.</p></div></div>
+          <div class="cell-panel"><div><p class="desc">Our proprietary 0&ndash;100 rating of how strong a fit this program is for you &mdash; blending athletic level, academic match, cost, and roster need into one number. Higher is a better all-around opportunity.</p></div></div>
         </div>
 
-        <div class="cell expandable" style="--d:.08s">
+        <div class="cell expandable score" style="--d:.08s">
           <button class="cell-btn js-expand" aria-expanded="false"><span class="accent"></span>
             <span class="cell-top"><span class="ico"><svg viewBox="0 0 24 24"><path d="M3 11a6 6 0 0 0 6 6h3l7 3v-8.5A6 6 0 0 0 12 5H9a6 6 0 0 0-6 6Z"/><circle cx="8.5" cy="11" r="1.6"/></svg></span><span class="label">Coach Grade</span></span>
-            <span class="gauge"><span class="ring ring--sm" data-pct="91"><svg viewBox="0 0 80 80"><circle class="track" cx="40" cy="40" r="32"/><circle class="prog" cx="40" cy="40" r="32"/></svg><span class="rnum">A&minus;</span></span></span>
+            <span class="gauge"><span class="ring ring--md" data-pct="91"><svg viewBox="0 0 96 96"><circle class="track" cx="48" cy="48" r="40"/><circle class="prog" cx="48" cy="48" r="40"/></svg><span class="rnum">91</span></span><span class="ringsub">out of 100</span></span>
             <span class="toggle"><svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg></span>
           </button>
-          <div class="cell-panel"><div><p class="desc">A composite grade for the coaching staff based on player development, retention, tenure, and athlete feedback &mdash; how well this staff grows the players they bring in.</p></div></div>
+          <div class="cell-panel"><div><p class="desc">A 0&ndash;100 score for the coaching staff based on player development, retention, tenure, and athlete feedback &mdash; how well this staff grows the players they bring in.</p></div></div>
         </div>
 
         <div class="cell expandable" style="--d:.12s">
@@ -386,7 +433,7 @@ h1{font-weight:900; letter-spacing:-.025em; line-height:1.03; margin:0;}
           <div class="cell-panel"><div><p class="desc">Estimated openings at your position for the upcoming class, based on the current roster, graduating seniors, and typical class size. More spots means a clearer path to playing time.</p></div></div>
         </div>
 
-        <div class="cell expandable span2" style="--d:.16s">
+        <div class="cell expandable" style="--d:.16s">
           <button class="cell-btn js-expand" aria-expanded="false"><span class="accent"></span>
             <span class="cell-top"><span class="ico"><svg viewBox="0 0 24 24"><path d="M12 4 3 20h18L12 4Z"/><path d="M12 10v10"/></svg></span><span class="label">Camps</span></span>
             <span class="value">4<span class="unit">upcoming</span></span>
@@ -400,21 +447,8 @@ h1{font-weight:900; letter-spacing:-.025em; line-height:1.03; margin:0;}
 
       <!-- ===== ADMISSIONS ===== -->
       <div class="sec-h"><span class="dot"></span>Admissions</div>
-      <div class="grid">
-        <div class="cell expandable hero-cell span2" style="--d:.02s">
-          <button class="cell-btn js-expand" aria-expanded="false"><span class="accent"></span>
-            <span class="hero-left">
-              <span class="cell-top"><span class="ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m8.5 12.5 2.5 2.5 4.5-5" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="label">Acceptance Rate</span></span>
-              <span class="value">34.51<span class="unit">%</span></span>
-              <span class="tagline">Selective</span>
-            </span>
-            <span class="ring" data-pct="35"><svg viewBox="0 0 84 84"><circle class="track" cx="42" cy="42" r="36"/><circle class="prog" cx="42" cy="42" r="36"/></svg><span class="rnum">35<small>%</small></span></span>
-            <span class="toggle"><svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg></span>
-          </button>
-          <div class="cell-panel"><div><p class="desc">The share of applicants offered admission. Lower means more selective &mdash; weigh it against the GPA and test ranges above to gauge your odds.</p></div></div>
-        </div>
-      </div>
       <div class="rows">
+        <div class="row"><span class="k">Acceptance Rate</span><span class="v">34.51%</span></div>
         <div class="row"><span class="k">Yearly Cost</span><span class="v">$44,743</span></div>
         <div class="row"><span class="k">US News Ranking</span><span class="v">#&ndash;</span></div>
       </div>
@@ -466,17 +500,30 @@ h1{font-weight:900; letter-spacing:-.025em; line-height:1.03; margin:0;}
 
 
 <script>
-/* ---- ring gauges: animate each ring to its data-pct ---- */
+/* ---- fit color scale (green = great fit ... red = poor fit) ----
+   Thresholds you can tune:  >=85 green · 70-84 lime · 55-69 yellow · 40-54 orange · <40 red */
+function fitColor(pct){
+  if (pct >= 85) return '#16a34a';   // green   — excellent fit
+  if (pct >= 70) return '#84cc16';   // lime    — strong fit
+  if (pct >= 55) return '#eab308';   // yellow  — decent fit
+  if (pct >= 40) return '#f97316';   // orange  — stretch
+  return '#ef4444';                  // red     — reach / poor fit
+}
+
+/* ---- ring gauges: fill to data-pct and color by fit ---- */
 function initRings(){
   document.querySelectorAll('.ring').forEach(function (r) {
     var prog = r.querySelector('.prog'); if (!prog) return;
     var rad = parseFloat(prog.getAttribute('r'));
     var circ = 2 * Math.PI * rad;
     var pct = Math.max(0, Math.min(100, parseFloat(r.dataset.pct || '0')));
+    var col = fitColor(pct);
+    prog.style.stroke = col;                                 // color-code the fill
+    var num = r.querySelector('.rnum'); if (num) num.style.color = col;
     prog.style.strokeDasharray = circ.toFixed(1);
     prog.style.strokeDashoffset = circ.toFixed(1);          // start empty
     requestAnimationFrame(function(){ requestAnimationFrame(function(){
-      prog.style.strokeDashoffset = (circ * (1 - pct/100)).toFixed(1);  // animate to value
+      prog.style.strokeDashoffset = (circ * (1 - pct/100)).toFixed(1);  // animate to exact %
     });});
   });
 }
@@ -510,10 +557,12 @@ var profile = document.getElementById('profile');
 var logoImg = document.getElementById('schoolLogo');
 var logoMono = document.getElementById('schoolMono');
 logoImg.onerror = function(){ logoImg.style.display='none'; logoMono.style.display='grid'; };
+var watermark = document.getElementById('schoolWatermark');
 function setLogo(url, mono){
   logoMono.textContent = mono || '';
   if (url){ logoImg.src = url; logoImg.style.display=''; logoMono.style.display='none'; }
   else { logoImg.style.display='none'; logoMono.style.display='grid'; }
+  if (watermark){ if (url){ watermark.src = url; watermark.style.display=''; } else { watermark.style.display='none'; } }
 }
 document.querySelectorAll('.switcher .sw').forEach(function (b) {
   b.addEventListener('click', function () {
