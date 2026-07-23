@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#ffffff">
 <meta property="og:title" content="Recruiting Profile — Athlete Narrative">
-<meta property="og:description" content="Tap the stat cells to expand. Switch schools to see it re-theme.">
+<meta property="og:description" content="Real per-school data. Tap cells to expand; toggle schools to re-theme.">
 <title>Recruiting Profile — School-Themed Cells + Buttons</title>
 
 <!--
@@ -150,6 +150,7 @@ h1{font-weight:900; letter-spacing:-.025em; line-height:1.03; margin:0;}
 .cell .label{ font-size:13.5px; font-weight:800; letter-spacing:-.01em; color:#2b2f36; }
 .cell .value{ display:block; font-size:26px; font-weight:900; letter-spacing:-.03em;
   color:var(--b1-text); margin-top:12px; line-height:1; }
+.cell .value.value-sm{ font-size:17px; margin-top:15px; letter-spacing:0; }
 .cell .value .unit{ font-size:13px; font-weight:700; color:var(--muted); margin-left:3px; }
 
 .cell .toggle{ position:absolute; top:13px; right:12px; width:24px;height:24px;border-radius:50%;
@@ -306,6 +307,16 @@ h1{font-weight:900; letter-spacing:-.025em; line-height:1.03; margin:0;}
       <circle cx="196" cy="1080" r="7"/><circle cx="220" cy="1010" r="3.5"/>
       <circle cx="200" cy="220" r="3"/><circle cx="216" cy="660" r="3.5"/>
     </g>
+    <!-- white highlight streaks + gaps for depth -->
+    <g filter="url(#roughL)" fill="none" stroke="#ffffff" stroke-linecap="round">
+      <path d="M96,-30 q34,300 -4,600 q-26,300 22,660" stroke-width="11" opacity=".92"/>
+      <path d="M138,140 q22,250 -12,520" stroke-width="5" opacity=".7"/>
+      <path d="M58,340 q18,200 -6,420" stroke-width="4" opacity=".55"/>
+    </g>
+    <g filter="url(#spatL)" fill="#ffffff">
+      <circle cx="150" cy="380" r="6"/><circle cx="186" cy="640" r="4"/>
+      <circle cx="140" cy="920" r="5"/><circle cx="176" cy="240" r="3.5"/>
+    </g>
   </svg>
 </div>
 <div class="paint r" aria-hidden="true">
@@ -335,14 +346,24 @@ h1{font-weight:900; letter-spacing:-.025em; line-height:1.03; margin:0;}
       <circle cx="196" cy="1120" r="7"/><circle cx="218" cy="440" r="3.5"/>
       <circle cx="200" cy="700" r="3"/><circle cx="214" cy="1020" r="3.5"/>
     </g>
+    <!-- white highlight streaks + gaps for depth -->
+    <g filter="url(#roughR)" fill="none" stroke="#ffffff" stroke-linecap="round">
+      <path d="M90,-30 q32,300 -6,600 q-24,300 20,660" stroke-width="11" opacity=".92"/>
+      <path d="M132,180 q20,250 -12,520" stroke-width="5" opacity=".7"/>
+      <path d="M52,400 q18,200 -6,420" stroke-width="4" opacity=".55"/>
+    </g>
+    <g filter="url(#spatR)" fill="#ffffff">
+      <circle cx="146" cy="440" r="6"/><circle cx="184" cy="700" r="4"/>
+      <circle cx="138" cy="980" r="5"/><circle cx="172" cy="300" r="3.5"/>
+    </g>
   </svg>
 </div>
 
 <!-- ===== DEMO ONLY: school color switcher (delete on integration) ===== -->
 <div class="switcher">
   <span class="lbl">School theme</span>
-  <button class="sw" style="background:#154734" data-c1="#154734" data-c2="#BD8B13" data-logo="https://a.espncdn.com/i/teamlogos/ncaa/500/13.png" data-mono="CP" data-name="California Polytechnic<br>State University" data-loc="San Luis Obispo, CA &middot; Big West" data-addr="San Luis Obispo, California"><i></i>Cal Poly</button>
-  <button class="sw" style="background:#00274C" data-c1="#00274C" data-c2="#FFCB05" data-logo="https://a.espncdn.com/i/teamlogos/ncaa/500/130.png" data-mono="M" data-name="University of Michigan" data-loc="Ann Arbor, MI &middot; Big Ten" data-addr="Ann Arbor, Michigan"><i></i>Michigan</button>
+  <button class="sw" style="background:#154734" data-c1="#154734" data-c2="#BD8B13" data-logo="https://a.espncdn.com/i/teamlogos/ncaa/500/13.png" data-mono="CP" data-name="California Polytechnic<br>State University" data-loc="San Luis Obispo, CA &middot; Big West" data-addr="San Luis Obispo, California" data-gpa="4.03" data-satm="Test-blind" data-satr="Test-blind" data-act="Test-blind" data-acc="30.0%" data-cost="$63,238" data-rank="#1 West" data-power="63" data-coach="34"><i></i>Cal Poly</button>
+  <button class="sw" style="background:#00274C" data-c1="#00274C" data-c2="#FFCB05" data-logo="https://a.espncdn.com/i/teamlogos/ncaa/500/130.png" data-mono="M" data-name="University of Michigan" data-loc="Ann Arbor, MI &middot; Big Ten" data-addr="Ann Arbor, Michigan" data-gpa="3.9" data-satm="680&ndash;780" data-satr="680&ndash;750" data-act="31&ndash;34" data-acc="15.6%" data-cost="$80,142" data-rank="#20" data-power="90" data-coach="82"><i></i>Michigan</button>
 </div>
 
 <div class="profile" id="profile" style="--brand-1:#154734; --brand-2:#BD8B13; --on-1:#ffffff; --on-2:#16181d;">
@@ -391,37 +412,37 @@ h1{font-weight:900; letter-spacing:-.025em; line-height:1.03; margin:0;}
         <div class="cell expandable" style="--d:.02s">
           <button class="cell-btn js-expand" aria-expanded="false"><span class="accent"></span>
             <span class="cell-top"><span class="ico"><svg viewBox="0 0 24 24"><path d="M12 4 2 9l10 5 10-5-10-5Z"/><path d="M6 11v5c0 1 2.7 2.5 6 2.5s6-1.5 6-2.5v-5"/></svg></span><span class="label">GPA</span></span>
-            <span class="value">4.00</span>
+            <span class="value" id="statGpa">4.03</span>
             <span class="toggle"><svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg></span>
           </button>
-          <div class="cell-panel"><div><p class="desc">Average unweighted GPA of admitted students &mdash; a benchmark for where you&rsquo;ll be a competitive academic applicant.</p></div></div>
+          <div class="cell-panel"><div><p class="desc">Average GPA of admitted students (GPA scale varies by school) &mdash; a benchmark for where you&rsquo;ll be academically competitive.</p></div></div>
         </div>
 
         <div class="cell expandable" style="--d:.06s">
           <button class="cell-btn js-expand" aria-expanded="false"><span class="accent"></span>
             <span class="cell-top"><span class="ico"><svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><rect x="8" y="6" width="8" height="3" rx="1"/><path d="M8.5 13h.01M12 13h.01M15.5 13h.01M8.5 17h.01M12 17h.01M15.5 17h.01" stroke-linecap="round" stroke-width="2.2"/></svg></span><span class="label">SAT Math</span></span>
-            <span class="value">610&ndash;720</span>
+            <span class="value value-sm" id="statSatM">Test-blind</span>
             <span class="toggle"><svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg></span>
           </button>
-          <div class="cell-panel"><div><p class="desc">The middle 50% (25th&ndash;75th percentile) SAT Math range of admitted students. Land in or above this band to be competitive.</p></div></div>
+          <div class="cell-panel"><div><p class="desc">Where reported, the middle 50% SAT Math range of admitted students. Note: Cal Poly and the Cal State system are <b>test-blind</b> &mdash; SAT/ACT are not used in admission at all.</p></div></div>
         </div>
 
         <div class="cell expandable" style="--d:.10s">
           <button class="cell-btn js-expand" aria-expanded="false"><span class="accent"></span>
             <span class="cell-top"><span class="ico"><svg viewBox="0 0 24 24"><path d="M12 6C10 4.6 7 4.6 4 5.6v12.8C7 17.4 10 17.4 12 18.8M12 6c2-1.4 5-1.4 8-.4v12.8c-3-1-6-1-8 .4M12 6v12.8"/></svg></span><span class="label">SAT Reading</span></span>
-            <span class="value">610&ndash;690</span>
+            <span class="value value-sm" id="statSatR">Test-blind</span>
             <span class="toggle"><svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg></span>
           </button>
-          <div class="cell-panel"><div><p class="desc">The middle 50% SAT Reading &amp; Writing range of admitted students &mdash; your target zone for a strong application.</p></div></div>
+          <div class="cell-panel"><div><p class="desc">Where reported, the middle 50% SAT Reading &amp; Writing range. Test-blind schools like Cal Poly don&rsquo;t consider SAT/ACT scores in admission.</p></div></div>
         </div>
 
         <div class="cell expandable" style="--d:.14s">
           <button class="cell-btn js-expand" aria-expanded="false"><span class="accent"></span>
             <span class="cell-top"><span class="ico"><svg viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4h6v3H9z"/><path d="m8.5 13.5 2 2 4-4.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="label">ACT</span></span>
-            <span class="value">26&ndash;32</span>
+            <span class="value value-sm" id="statAct">Test-blind</span>
             <span class="toggle"><svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg></span>
           </button>
-          <div class="cell-panel"><div><p class="desc">The middle 50% composite ACT range of admitted students. Scoring in this band keeps academics from being a barrier to admission.</p></div></div>
+          <div class="cell-panel"><div><p class="desc">Where reported, the middle 50% ACT composite range. Test-optional schools (like Michigan) use it when submitted; test-blind schools (Cal Poly) don&rsquo;t use it at all.</p></div></div>
         </div>
 
       </div>
@@ -433,7 +454,7 @@ h1{font-weight:900; letter-spacing:-.025em; line-height:1.03; margin:0;}
         <div class="cell expandable score" style="--d:.02s">
           <button class="cell-btn js-expand" aria-expanded="false"><span class="accent"></span>
             <span class="cell-top"><span class="ico"><svg viewBox="0 0 24 24"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8Z"/></svg></span><span class="label">Power Score</span></span>
-            <span class="gauge"><span class="ring ring--md" data-pct="63"><svg viewBox="0 0 96 96"><circle class="track" cx="48" cy="48" r="40"/><circle class="prog" cx="48" cy="48" r="40"/></svg><span class="rnum">63</span></span><span class="ringsub">out of 100</span></span>
+            <span class="gauge"><span class="ring ring--md" id="ringPower" data-pct="63"><svg viewBox="0 0 96 96"><circle class="track" cx="48" cy="48" r="40"/><circle class="prog" cx="48" cy="48" r="40"/></svg><span class="rnum">63</span></span><span class="ringsub">out of 100</span></span>
             <span class="toggle"><svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg></span>
           </button>
           <div class="cell-panel"><div><p class="desc">Our proprietary 0&ndash;100 rating of how strong a fit this program is for you &mdash; blending athletic level, academic match, cost, and roster need into one number. Higher is a better all-around opportunity.</p></div></div>
@@ -442,7 +463,7 @@ h1{font-weight:900; letter-spacing:-.025em; line-height:1.03; margin:0;}
         <div class="cell expandable score" style="--d:.08s">
           <button class="cell-btn js-expand" aria-expanded="false"><span class="accent"></span>
             <span class="cell-top"><span class="ico"><svg viewBox="0 0 24 24"><path d="M3 11a6 6 0 0 0 6 6h3l7 3v-8.5A6 6 0 0 0 12 5H9a6 6 0 0 0-6 6Z"/><circle cx="8.5" cy="11" r="1.6"/></svg></span><span class="label">Coach Grade</span></span>
-            <span class="gauge"><span class="ring ring--md" data-pct="34"><svg viewBox="0 0 96 96"><circle class="track" cx="48" cy="48" r="40"/><circle class="prog" cx="48" cy="48" r="40"/></svg><span class="rnum">34</span></span><span class="ringsub">out of 100</span></span>
+            <span class="gauge"><span class="ring ring--md" id="ringCoach" data-pct="34"><svg viewBox="0 0 96 96"><circle class="track" cx="48" cy="48" r="40"/><circle class="prog" cx="48" cy="48" r="40"/></svg><span class="rnum">34</span></span><span class="ringsub">out of 100</span></span>
             <span class="toggle"><svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg></span>
           </button>
           <div class="cell-panel"><div><p class="desc">A 0&ndash;100 score for the coaching staff based on player development, retention, tenure, and athlete feedback &mdash; how well this staff grows the players they bring in.</p></div></div>
@@ -472,9 +493,9 @@ h1{font-weight:900; letter-spacing:-.025em; line-height:1.03; margin:0;}
       <!-- ===== ADMISSIONS ===== -->
       <div class="sec-h"><span class="dot"></span>Admissions</div>
       <div class="rows">
-        <div class="row"><span class="k">Acceptance Rate</span><span class="v">34.51%</span></div>
-        <div class="row"><span class="k">Yearly Cost</span><span class="v">$44,743</span></div>
-        <div class="row"><span class="k">US News Ranking</span><span class="v">#&ndash;</span></div>
+        <div class="row"><span class="k">Acceptance Rate</span><span class="v" id="statAcc">30.0%</span></div>
+        <div class="row"><span class="k">Yearly Cost</span><span class="v" id="statCost">$63,238</span></div>
+        <div class="row"><span class="k">US News Ranking</span><span class="v" id="statRank">#1 West</span></div>
       </div>
 
       <!-- ===== EXPLORE (buttons) ===== -->
@@ -552,6 +573,13 @@ function initRings(){
   });
 }
 initRings();
+/* update a score ring's value + refill */
+function setRing(id, val){
+  if (val == null) return;
+  var ring = document.getElementById(id); if (!ring) return;
+  ring.dataset.pct = val;
+  var num = ring.querySelector('.rnum'); if (num) num.textContent = val;
+}
 
 /* ---- expand hook (cells + buttons) ---- */
 document.querySelectorAll('.js-expand').forEach(function (btn) {
@@ -588,6 +616,10 @@ function setLogo(url, mono){
   else { logoImg.style.display='none'; logoMono.style.display='grid'; }
   if (watermark){ if (url){ watermark.src = url; watermark.style.display=''; } else { watermark.style.display='none'; } }
 }
+function setTxt(id, v){ if (v == null) return; var el = document.getElementById(id); if (!el) return;
+  el.innerHTML = v;
+  if (el.classList.contains('value')) el.classList.toggle('value-sm', v.replace(/<[^>]+>/g,'').length > 7);
+}
 document.querySelectorAll('.switcher .sw').forEach(function (b) {
   b.addEventListener('click', function () {
     applyTheme(profile, b.dataset.c1, b.dataset.c2);
@@ -595,6 +627,13 @@ document.querySelectorAll('.switcher .sw').forEach(function (b) {
     document.getElementById('schoolName').innerHTML = b.dataset.name;
     document.getElementById('schoolSub').innerHTML = '<span class="pin"></span>' + b.dataset.loc;
     document.getElementById('schoolAddr').textContent = b.dataset.addr;
+    // swap the stats for this school
+    setTxt('statGpa', b.dataset.gpa);   setTxt('statSatM', b.dataset.satm);
+    setTxt('statSatR', b.dataset.satr); setTxt('statAct', b.dataset.act);
+    setTxt('statAcc', b.dataset.acc);   setTxt('statCost', b.dataset.cost);
+    setTxt('statRank', b.dataset.rank);
+    setRing('ringPower', b.dataset.power); setRing('ringCoach', b.dataset.coach);
+    initRings();  // re-fill + re-color the score rings
   });
 });
 </script>
