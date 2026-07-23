@@ -53,7 +53,7 @@
 body{ margin:0; background:#ffffff;
   color:var(--text); font-family:"Archivo",system-ui,-apple-system,"Segoe UI",sans-serif;
   -webkit-font-smoothing:antialiased; line-height:1.5; padding:22px 34px 70px; }
-.paint{ position:fixed; top:0; bottom:0; width:16vw; min-width:70px; max-width:200px; z-index:0; pointer-events:none; }
+.paint{ position:fixed; top:0; bottom:0; width:19vw; min-width:92px; max-width:240px; z-index:0; pointer-events:none; }
 .paint.l{ left:0; }
 .paint.r{ right:0; transform:scaleX(-1); }
 .paint svg{ width:100%; height:100%; display:block; }
@@ -276,40 +276,64 @@ h1{font-weight:900; letter-spacing:-.025em; line-height:1.03; margin:0;}
 </head>
 <body>
 
-<!-- Athlete Narrative paint-streak edges (swap for the real brand paint asset if you have it) -->
+<!-- Athlete Narrative paint edges — torn/grunge brush look via turbulence filter (swap for real brand paint if available) -->
 <div class="paint l" aria-hidden="true">
-  <svg viewBox="0 0 200 1000" preserveAspectRatio="xMinYMid slice">
-    <g fill="#a6e82c">
-      <path d="M0,40 C70,70 30,150 78,210 C120,262 44,320 92,392 C132,452 40,512 86,590 C126,658 44,720 96,800 C132,856 60,910 44,1000 L0,1000 Z"/>
-      <path d="M0,0 C40,30 18,90 44,150 L0,150 Z"/>
+  <svg viewBox="0 0 240 1200" preserveAspectRatio="xMinYMid slice">
+    <defs>
+      <filter id="roughL" x="-40%" y="-8%" width="180%" height="116%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.013 0.026" numOctaves="4" seed="11" result="n"/>
+        <feDisplacementMap in="SourceGraphic" in2="n" scale="34" xChannelSelector="R" yChannelSelector="G"/>
+      </filter>
+      <filter id="spatL" x="-60%" y="-10%" width="220%" height="120%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="4" result="s"/>
+        <feDisplacementMap in="SourceGraphic" in2="s" scale="9"/>
+      </filter>
+    </defs>
+    <g filter="url(#roughL)">
+      <path d="M-40,-30 L150,-30 L182,300 L138,600 L176,900 L128,1230 L-40,1230 Z" fill="#a6e82c"/>
+      <path d="M-40,-30 L70,-30 L92,340 L52,700 L88,1040 L44,1230 L-40,1230 Z" fill="#8ccf22"/>
+      <path d="M46,-30 L120,-30 L150,330 L104,660 L142,980 L96,1230 L58,1230 Z" fill="#c4ff3d" opacity=".92"/>
     </g>
-    <g fill="#c4ff3d" opacity=".85">
-      <path d="M62,120 c30,44 -18,92 20,150 c34,52 -20,96 16,158 c30,52 -14,96 14,168 c22,56 -8,92 6,150" fill="none" stroke="#c4ff3d" stroke-width="15" stroke-linecap="round"/>
+    <!-- drips reaching inward -->
+    <g filter="url(#roughL)" stroke="#a6e82c" stroke-width="9" stroke-linecap="round" fill="none">
+      <path d="M150,210 q40,20 34,120"/><path d="M172,760 q36,26 26,140"/>
     </g>
-    <g fill="#8ccf22">
-      <ellipse cx="112" cy="250" rx="9" ry="16" transform="rotate(24 112 250)"/>
-      <ellipse cx="96" cy="470" rx="7" ry="13" transform="rotate(-16 96 470)"/>
-      <ellipse cx="126" cy="660" rx="8" ry="15" transform="rotate(18 126 660)"/>
-      <circle cx="140" cy="360" r="5"/><circle cx="120" cy="560" r="4"/><circle cx="150" cy="820" r="6"/>
-      <circle cx="86" cy="150" r="3.5"/><circle cx="132" cy="930" r="4.5"/>
+    <!-- flung splatter -->
+    <g filter="url(#spatL)" fill="#8ccf22">
+      <circle cx="180" cy="160" r="11"/><circle cx="205" cy="300" r="5"/>
+      <ellipse cx="192" cy="470" rx="8" ry="13"/><circle cx="214" cy="560" r="4"/>
+      <circle cx="186" cy="720" r="9"/><circle cx="210" cy="900" r="6"/>
+      <circle cx="196" cy="1080" r="7"/><circle cx="220" cy="1010" r="3.5"/>
+      <circle cx="200" cy="220" r="3"/><circle cx="216" cy="660" r="3.5"/>
     </g>
   </svg>
 </div>
 <div class="paint r" aria-hidden="true">
-  <svg viewBox="0 0 200 1000" preserveAspectRatio="xMinYMid slice">
-    <g fill="#a6e82c">
-      <path d="M0,80 C66,120 28,190 74,250 C118,308 40,362 88,440 C128,506 44,560 90,640 C130,708 48,772 92,852 C128,910 58,948 42,1000 L0,1000 Z"/>
-      <path d="M0,10 C44,44 20,96 40,150 L0,150 Z"/>
+  <svg viewBox="0 0 240 1200" preserveAspectRatio="xMinYMid slice">
+    <defs>
+      <filter id="roughR" x="-40%" y="-8%" width="180%" height="116%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.012 0.028" numOctaves="4" seed="27" result="n"/>
+        <feDisplacementMap in="SourceGraphic" in2="n" scale="32" xChannelSelector="R" yChannelSelector="G"/>
+      </filter>
+      <filter id="spatR" x="-60%" y="-10%" width="220%" height="120%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" seed="15" result="s"/>
+        <feDisplacementMap in="SourceGraphic" in2="s" scale="9"/>
+      </filter>
+    </defs>
+    <g filter="url(#roughR)">
+      <path d="M-40,-30 L158,-30 L176,340 L134,660 L172,980 L120,1230 L-40,1230 Z" fill="#a6e82c"/>
+      <path d="M-40,-30 L64,-30 L86,380 L48,720 L84,1060 L40,1230 L-40,1230 Z" fill="#8ccf22"/>
+      <path d="M40,-30 L112,-30 L142,360 L98,700 L136,1020 L90,1230 L52,1230 Z" fill="#c4ff3d" opacity=".92"/>
     </g>
-    <g>
-      <path d="M58,160 c30,46 -18,90 18,150 c32,52 -18,96 14,156 c28,50 -12,92 12,162" fill="none" stroke="#c4ff3d" stroke-width="14" stroke-linecap="round" opacity=".85"/>
+    <g filter="url(#roughR)" stroke="#a6e82c" stroke-width="9" stroke-linecap="round" fill="none">
+      <path d="M146,300 q42,18 32,130"/><path d="M168,820 q34,28 24,140"/>
     </g>
-    <g fill="#8ccf22">
-      <ellipse cx="108" cy="300" rx="8" ry="15" transform="rotate(20 108 300)"/>
-      <ellipse cx="124" cy="520" rx="7" ry="13" transform="rotate(-14 124 520)"/>
-      <ellipse cx="98" cy="720" rx="9" ry="16" transform="rotate(22 98 720)"/>
-      <circle cx="138" cy="420" r="5"/><circle cx="118" cy="620" r="4"/><circle cx="146" cy="880" r="5.5"/>
-      <circle cx="90" cy="210" r="3.5"/>
+    <g filter="url(#spatR)" fill="#8ccf22">
+      <circle cx="176" cy="220" r="10"/><circle cx="204" cy="360" r="5"/>
+      <ellipse cx="190" cy="540" rx="8" ry="13"/><circle cx="212" cy="640" r="4"/>
+      <circle cx="184" cy="780" r="9"/><circle cx="208" cy="960" r="6"/>
+      <circle cx="196" cy="1120" r="7"/><circle cx="218" cy="440" r="3.5"/>
+      <circle cx="200" cy="700" r="3"/><circle cx="214" cy="1020" r="3.5"/>
     </g>
   </svg>
 </div>
