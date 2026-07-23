@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#154734">
+<meta property="og:title" content="Recruiting Profile — Athlete Narrative">
+<meta property="og:description" content="Tap the stat cells to expand. Switch schools to see it re-theme.">
+<title>Recruiting Profile — School-Themed Cells + Buttons</title>
+
+<!--
+  HANDOFF FOR DEV (full note at the bottom of the page):
+  The ENTIRE card themes off two variables set on .profile:
+      --brand-1  = school primary  (darker / surface color)
+      --brand-2  = school secondary (accent / pop color)
+  Everything else (tints, chips, ring, buttons, glow) derives from those two
+  via color-mix(), so a new school = set two hex values. A tiny JS helper
+  auto-picks readable text on those colors (--on-1 / --on-2).
+  Expandables share one hook (.js-expand); reveal is a pure-CSS grid animation.
+-->
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   THEME ENGINE — set --brand-1 / --brand-2 per school; the rest derives.
+   ============================================================ */
+.profile{
+  /* defaults (overridden per school, inline or via JS) */
+  --brand-1:#154734;   /* Cal Poly green */
+  --brand-2:#BD8B13;   /* Cal Poly gold  */
+  --on-1:#ffffff;      /* readable text on brand-1 (JS sets this) */
+  --on-2:#16181d;      /* readable text on brand-2 (JS sets this) */
+
+  /* derived — do not edit */
+  --tint:    color-mix(in srgb, var(--brand-1) 7%,  #fff);
+  --tint-2:  color-mix(in srgb, var(--brand-1) 13%, #fff);
+  --chip:    color-mix(in srgb, var(--brand-2) 20%, #fff);
+  --b1-text: color-mix(in srgb, var(--brand-1) 78%, #000);   /* school-colored, always readable on white */
+  --b1-dark: color-mix(in srgb, var(--brand-1) 74%, #000);
+  --b2-line: color-mix(in srgb, var(--brand-2) 45%, #fff);
+  --glow:    color-mix(in srgb, var(--brand-2) 42%, transparent);
+}
+
+:root{ --text:#191b20; --muted:#6b7079; --line:#ececec; --page:#e9ebee;
+  --shadow-sm:0 1px 2px rgba(20,24,29,.05);
+  --shadow:0 2px 6px rgba(20,24,29,.06),0 14px 34px rgba(20,24,29,.10);
+  --r:20px; }
+
+*{box-sizing:border-box;}
+body{ margin:0; background:radial-gradient(120% 60% at 50% -10%,#f5f7f9,var(--page) 60%);
+  color:var(--text); font-family:"Archivo",system-ui,-apple-system,"Segoe UI",sans-serif;
+  -webkit-font-smoothing:antialiased; line-height:1.5; padding:20px 16px 70px; }
+h1{font-weight:900; letter-spacing:-.025em; line-height:1.03; margin:0;}
+
+/* ---- demo school switcher (delete on integration) ---- */
+.switcher{ max-width:432px; margin:0 auto 16px; display:flex; flex-wrap:wrap; gap:7px; align-items:center;
+  background:#fff; border:1px solid #e3e6ea; border-radius:14px; padding:11px 13px; box-shadow:var(--shadow-sm); }
+.switcher .lbl{ font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.12em; color:var(--muted); margin-right:2px; }
+.sw{ border:0; cursor:pointer; font-family:inherit; font-weight:800; font-size:12px; color:#fff;
+  padding:7px 11px; border-radius:9px; display:flex; align-items:center; gap:6px; transition:transform .15s; }
+.sw:hover{ transform:translateY(-2px); }
+.sw i{ width:10px;height:10px;border-radius:50%; display:inline-block; border:1.5px solid rgba(255,255,255,.7); }
+
+/* ---- preview phone frame ---- */
+.frame{ max-width:432px; margin:0 auto; background:#fff; border-radius:34px;
+  box-shadow:var(--shadow); overflow:hidden; position:relative; isolation:isolate; }
+
+/* ============================================================
+   THEMED HERO BANNER (replaces the plain white header)
+   ============================================================ */
+.hero-band{ position:relative; overflow:hidden; padding:30px 22px 26px; text-align:center;
+  background:linear-gradient(158deg,var(--brand-1),var(--b1-dark)); color:var(--on-1); }
+.hero-band::before,.hero-band::after{ content:""; position:absolute; pointer-events:none;
+  background:linear-gradient(180deg,color-mix(in srgb,var(--brand-2) 90%,#fff),var(--brand-2)); opacity:.85; }
+.hero-band::before{ width:60px;height:200px; left:-26px; top:-30px; border-radius:46% 54% 60% 40%; transform:rotate(20deg); opacity:.5;}
+.hero-band::after{ width:70px;height:230px; right:-30px; bottom:-60px; border-radius:56% 44% 42% 58%; transform:rotate(-14deg); opacity:.55;}
+/* logo tile (white so any school logo reads cleanly) */
+.hero-band .logo-tile{ position:relative; z-index:1; width:90px;height:90px;border-radius:22px; margin:0 auto 12px;
+  display:grid;place-items:center; background:#fff; padding:11px;
+  box-shadow:0 12px 26px rgba(0,0,0,.30), inset 0 0 0 2px rgba(255,255,255,.4);}
+.hero-band .logo-tile .logo{ max-width:100%; max-height:100%; object-fit:contain; display:block; }
+.hero-band .logo-tile .logo-mono{ display:none; font-weight:900; font-size:32px; letter-spacing:-.05em; color:var(--b1-dark); }
+
+/* Location card with map */
+.loc-card{ background:#fff; border:1px solid color-mix(in srgb,var(--brand-1) 8%,#eee); border-radius:var(--r);
+  padding:15px 15px; box-shadow:var(--shadow-sm),0 8px 20px rgba(20,24,29,.06); margin-bottom:6px;
+  animation:rise .55s both; }
+.loc-card .loc-head{ display:flex; align-items:center; gap:8px; font-weight:900; font-size:16px; color:var(--b1-text); }
+.loc-card .loc-head svg{ width:16px;height:16px; stroke:var(--brand-1); fill:none; stroke-width:2; }
+.loc-card .loc-addr{ margin:3px 0 11px; padding-left:24px; color:var(--muted); font-weight:600; font-size:13.5px; }
+.map{ position:relative; border-radius:14px; overflow:hidden; height:168px; border:1px solid #e6e6e6; }
+.map > svg{ width:100%; height:100%; display:block; }
+.map .pin{ position:absolute; left:50%; top:47%; transform:translate(-50%,-100%); }
+.map .pin svg{ width:34px;height:34px; filter:drop-shadow(0 3px 4px rgba(0,0,0,.35)); }
+.map .maptag{ position:absolute; right:7px; bottom:6px; font-size:9px; color:#6b7079; background:rgba(255,255,255,.7); padding:1px 5px; border-radius:4px; }
+.hero-band h1{ position:relative; z-index:1; font-size:24px; color:var(--on-1); }
+.hero-band .sub{ position:relative; z-index:1; margin-top:9px; font-size:13px; font-weight:700;
+  color:var(--on-1); opacity:.85; display:inline-flex; gap:7px; align-items:center; }
+.hero-band .sub .pin{ width:6px;height:6px;border-radius:50%; background:var(--brand-2); box-shadow:0 0 0 3px color-mix(in srgb,var(--brand-2) 40%,transparent);}
+
+.pad{ position:relative; z-index:1; padding:22px 18px 30px; }
+
+/* ---- section heading ---- */
+.sec-h{ display:flex;align-items:center;gap:11px; font-size:12px;font-weight:800;
+  text-transform:uppercase;letter-spacing:.15em; color:var(--muted); margin:22px 4px 13px; }
+.sec-h .dot{ width:7px;height:7px;border-radius:50%;background:var(--brand-2); box-shadow:0 0 0 4px var(--glow); }
+.sec-h::after{content:"";flex:1;height:1.5px;background:var(--line);border-radius:2px;}
+
+/* ============================================================
+   EXPANDABLE STAT CELL
+   ============================================================ */
+.grid{ display:grid; grid-template-columns:1fr 1fr; gap:13px; }
+.cell{ position:relative; border-radius:var(--r); overflow:hidden;
+  background:linear-gradient(165deg,#fff 24%,var(--tint));
+  box-shadow:var(--shadow-sm),0 8px 20px rgba(20,24,29,.06);
+  border:1px solid color-mix(in srgb,var(--brand-1) 10%,#fff);
+  transition:transform .28s cubic-bezier(.2,.7,.2,1),box-shadow .28s,border-color .28s;
+  animation:rise .55s both; animation-delay:var(--d,0s); }
+.cell:hover{ transform:translateY(-4px); box-shadow:0 12px 26px var(--glow),0 20px 44px rgba(20,24,29,.12); border-color:var(--brand-2); }
+.cell:active{ transform:translateY(-1px) scale(.995); }
+.cell.open{ border-color:var(--brand-2); box-shadow:0 12px 26px var(--glow),0 20px 44px rgba(20,24,29,.12); }
+
+.cell .accent{ position:absolute; left:0; top:0; bottom:0; width:5px;
+  background:linear-gradient(180deg,var(--brand-2),var(--brand-1));
+  transform:scaleY(0); transform-origin:top; transition:transform .3s ease; }
+.cell:hover .accent, .cell.open .accent{ transform:scaleY(1); }
+
+.cell-btn{ width:100%; text-align:left; background:none; border:0; cursor:pointer;
+  padding:16px 16px 15px; font-family:inherit; color:var(--text); display:block; }
+.cell-top{ display:flex; align-items:center; gap:9px; }
+.cell .ico{ width:30px;height:30px;border-radius:9px;flex:0 0 auto; background:var(--chip);
+  display:grid;place-items:center; transition:background .25s,transform .25s; }
+.cell .ico svg{ width:17px;height:17px; stroke:var(--b1-text); stroke-width:2; fill:none; }
+.cell:hover .ico, .cell.open .ico{ background:var(--brand-1); transform:rotate(-4deg); }
+.cell:hover .ico svg, .cell.open .ico svg{ stroke:var(--brand-2); }
+.cell .label{ font-size:13.5px; font-weight:800; letter-spacing:-.01em; color:#2b2f36; }
+.cell .value{ display:block; font-size:26px; font-weight:900; letter-spacing:-.03em;
+  color:var(--b1-text); margin-top:12px; line-height:1; }
+.cell .value .unit{ font-size:13px; font-weight:700; color:var(--muted); margin-left:3px; }
+
+.cell .toggle{ position:absolute; top:13px; right:12px; width:24px;height:24px;border-radius:50%;
+  background:#fff; display:grid;place-items:center; box-shadow:0 2px 6px rgba(20,24,29,.16);
+  transition:transform .35s cubic-bezier(.3,1.4,.5,1),background .25s; z-index:2; }
+.cell .toggle svg{ width:12px;height:12px; stroke:var(--b1-text); stroke-width:3; }
+.cell.open .toggle{ transform:rotate(135deg); background:var(--brand-1); }
+.cell.open .toggle svg{ stroke:var(--brand-2); }
+
+.cell-panel{ display:grid; grid-template-rows:0fr; transition:grid-template-rows .34s cubic-bezier(.4,0,.2,1); }
+.cell-panel > div{ overflow:hidden; }
+.cell.open .cell-panel{ grid-template-rows:1fr; }
+.cell .desc{ padding:2px 16px 16px 20px; font-size:13px; line-height:1.6; color:#3a3f47;
+  opacity:0; transform:translateY(8px); transition:opacity .3s .06s,transform .3s .06s; }
+.cell.open .desc{ opacity:1; transform:none; }
+.grid .cell.span2{ grid-column:1 / -1; }
+
+/* Power Score HERO with ring */
+.hero-cell .cell-btn{ display:flex; align-items:center; gap:16px; }
+.hero-cell .hero-left{ flex:1; }
+.hero-cell .value{ font-size:38px; margin-top:8px; }
+.hero-cell .tagline{ display:inline-block; margin-top:10px; font-size:11px; font-weight:800;
+  text-transform:uppercase; letter-spacing:.08em; color:var(--b1-text);
+  background:var(--chip); padding:4px 11px; border-radius:999px; }
+.ring{ flex:0 0 auto; width:84px;height:84px; position:relative; }
+.ring svg{ width:84px;height:84px; transform:rotate(-90deg); }
+.ring .track{ fill:none; stroke:color-mix(in srgb,var(--brand-1) 14%,#fff); stroke-width:8; }
+.ring .prog{ fill:none; stroke:var(--brand-2); stroke-width:8; stroke-linecap:round;
+  stroke-dasharray:226; stroke-dashoffset:226; animation:ring 1.1s .25s cubic-bezier(.3,.8,.3,1) forwards; }
+.ring .rnum{ position:absolute; inset:0; display:grid;place-items:center; font-weight:900; font-size:20px;
+  letter-spacing:-.03em; color:var(--b1-text); }
+
+/* info rows */
+.rows{ margin:6px 6px; }
+.row{ display:flex; justify-content:space-between; align-items:center; padding:13px 0; border-bottom:1px solid var(--line); }
+.row:last-child{ border-bottom:0; }
+.row .k{ color:var(--text); font-weight:600; font-size:15.5px; }
+.row .v{ font-weight:900; font-size:19px; letter-spacing:-.02em; color:var(--b1-text); }
+
+/* ============================================================
+   BUTTONS
+   ============================================================ */
+.btns{ display:flex; flex-direction:column; gap:11px; }
+.btn{ --bg:var(--brand-1); --fg:var(--on-1);
+  position:relative; display:flex; align-items:center; gap:13px; width:100%;
+  padding:16px 18px; border-radius:16px; border:2px solid var(--bg);
+  background:linear-gradient(160deg,color-mix(in srgb,var(--bg) 88%,#fff),var(--bg));
+  color:var(--fg); cursor:pointer; overflow:hidden;
+  font-family:inherit; font-size:16px; font-weight:800; letter-spacing:-.01em; text-decoration:none;
+  transition:transform .18s cubic-bezier(.2,.7,.2,1),box-shadow .25s,background .25s,border-color .25s;
+  animation:rise .55s both; animation-delay:var(--d,0s); }
+.btn:hover{ transform:translateY(-3px); box-shadow:0 10px 24px var(--glow),0 16px 40px rgba(20,24,29,.16); }
+.btn:active{ transform:translateY(-1px) scale(.99); }
+.btn .btn-ico{ width:30px;height:30px;border-radius:9px;flex:0 0 auto; display:grid;place-items:center;
+  background:color-mix(in srgb,var(--brand-2) 26%,transparent); }
+.btn .btn-ico svg{ width:18px;height:18px; stroke:var(--brand-2); stroke-width:2.2; fill:none; }
+.btn .btn-txt{ flex:1; }
+.btn .btn-end{ display:grid;place-items:center; transition:transform .25s; }
+.btn .btn-end svg{ width:18px;height:18px; stroke:var(--brand-2); stroke-width:2.4; fill:none; }
+.btn::after{ content:""; position:absolute; top:0; left:-60%; width:45%; height:100%;
+  background:linear-gradient(100deg,transparent,rgba(255,255,255,.18),transparent);
+  transform:skewX(-18deg); transition:left .5s ease; }
+.btn:hover::after{ left:130%; }
+.btn--dark:hover .btn-end{ transform:translate(3px,-3px); }
+
+/* accent (secondary-color) button */
+.btn--accent{ --bg:var(--brand-2); --fg:var(--on-2); }
+.btn--accent .btn-ico{ background:color-mix(in srgb,var(--brand-1) 20%,transparent); }
+.btn--accent .btn-ico svg, .btn--accent .btn-end svg{ stroke:var(--on-2); }
+
+/* outline EXPAND button */
+.btn--outline{ background:#fff; color:var(--b1-text); border-color:var(--brand-1); }
+.btn--outline .btn-ico{ background:var(--chip); }
+.btn--outline .btn-ico svg{ stroke:var(--b1-text); }
+.btn--outline .btn-end svg{ stroke:var(--b1-text); transition:transform .3s; }
+.expandable.open .btn--outline{ background:linear-gradient(160deg,color-mix(in srgb,var(--brand-1) 88%,#fff),var(--brand-1)); color:var(--on-1); }
+.expandable.open .btn--outline .btn-ico{ background:color-mix(in srgb,var(--brand-2) 26%,transparent); }
+.expandable.open .btn--outline .btn-ico svg,
+.expandable.open .btn--outline .btn-end svg{ stroke:var(--brand-2); }
+.expandable.open .btn--outline .btn-end svg{ transform:rotate(180deg); }
+
+.btn-panel{ display:grid; grid-template-rows:0fr; transition:grid-template-rows .34s cubic-bezier(.4,0,.2,1); }
+.btn-panel > div{ overflow:hidden; }
+.expandable.open .btn-panel{ grid-template-rows:1fr; }
+.panel-body{ padding:14px 2px 2px; opacity:0; transform:translateY(8px); transition:opacity .3s .06s,transform .3s .06s; }
+.expandable.open .panel-body{ opacity:1; transform:none; }
+.chips{ display:flex; flex-wrap:wrap; gap:8px; }
+.chip{ background:#fff; color:var(--b1-text); font-weight:700; font-size:12.5px; padding:8px 13px;
+  border-radius:999px; border:1.5px solid var(--b2-line); box-shadow:0 1px 2px rgba(20,24,29,.05);
+  transition:transform .15s,border-color .2s,background .2s; }
+.chip:hover{ transform:translateY(-2px); border-color:var(--brand-2); background:var(--tint); }
+.panel-link{ display:inline-flex; align-items:center; gap:7px; margin-top:14px;
+  color:var(--b1-text); font-weight:800; font-size:13.5px; text-decoration:none; }
+.panel-link svg{ width:15px;height:15px; stroke:currentColor; stroke-width:2.4; fill:none; }
+
+/* social icon buttons */
+.socials{ display:flex; gap:11px; }
+.icon-btn{ width:54px;height:54px;border-radius:15px;flex:0 0 auto; position:relative; overflow:hidden;
+  background:linear-gradient(160deg,color-mix(in srgb,var(--brand-1) 88%,#fff),var(--brand-1));
+  display:grid;place-items:center; text-decoration:none; transition:transform .18s,box-shadow .25s;
+  animation:rise .55s both; animation-delay:var(--d,0s); }
+.icon-btn svg{ width:23px;height:23px; fill:var(--on-1); transition:fill .2s,transform .25s; }
+.icon-btn:hover{ transform:translateY(-3px); box-shadow:0 0 0 3px var(--glow),0 12px 26px rgba(20,24,29,.18); }
+.icon-btn:hover svg{ fill:var(--brand-2); transform:scale(1.08); }
+
+@keyframes rise{ from{opacity:0; transform:translateY(16px);} to{opacity:1; transform:none;} }
+@keyframes ring{ to{ stroke-dashoffset:18; } }  /* ~92% */
+@media (prefers-reduced-motion:reduce){ *{animation:none !important; transition:none !important;} }
+
+/* dev note */
+.devnote{ max-width:432px; margin:20px auto 0; font-size:12.5px; color:#6b7280;
+  background:#fff; border:1px dashed #cfd4da; border-radius:14px; padding:15px 17px; line-height:1.6; }
+.devnote b{ color:#374151; } .devnote code{ background:#f1f3f5; padding:1px 6px; border-radius:5px; font-size:12px; }
+</style>
+</head>
+<body>
+
+<!-- ===== DEMO ONLY: school color switcher (delete on integration) ===== -->
+<div class="switcher">
+  <span class="lbl">School theme</span>
+  <button class="sw" style="background:#154734" data-c1="#154734" data-c2="#BD8B13" data-logo="https://a.espncdn.com/i/teamlogos/ncaa/500/13.png" data-mono="CP" data-name="California Polytechnic<br>State University" data-loc="San Luis Obispo, CA &middot; Big West" data-addr="San Luis Obispo, California"><i></i>Cal Poly</button>
+  <button class="sw" style="background:#00274C" data-c1="#00274C" data-c2="#FFCB05" data-logo="https://a.espncdn.com/i/teamlogos/ncaa/500/130.png" data-mono="M" data-name="University of Michigan" data-loc="Ann Arbor, MI &middot; Big Ten" data-addr="Ann Arbor, Michigan"><i></i>Michigan</button>
+</div>
+
+<div class="profile" id="profile" style="--brand-1:#154734; --brand-2:#BD8B13; --on-1:#ffffff; --on-2:#16181d;">
+  <div class="frame">
+
+    <!-- themed banner -->
+    <div class="hero-band">
+      <div class="logo-tile">
+        <!-- bind src to the school's logo; monogram shows if it fails to load -->
+        <img class="logo" id="schoolLogo" src="https://a.espncdn.com/i/teamlogos/ncaa/500/13.png" alt="School logo">
+        <span class="logo-mono" id="schoolMono">CP</span>
+      </div>
+      <h1 id="schoolName">California Polytechnic<br>State University</h1>
+      <div class="sub" id="schoolSub"><span class="pin"></span>San Luis Obispo, CA &middot; Big West</div>
+    </div>
+
+    <div class="pad">
+
+      <!-- ===== LOCATION (map) ===== -->
+      <div class="loc-card">
+        <div class="loc-head"><svg viewBox="0 0 24 24"><path d="M12 21s7-6.2 7-12a7 7 0 1 0-14 0c0 5.8 7 12 7 12Z"/><circle cx="12" cy="9" r="2.5"/></svg>Location</div>
+        <div class="loc-addr" id="schoolAddr">San Luis Obispo, California</div>
+        <div class="map">
+          <svg viewBox="0 0 400 168" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+            <rect width="400" height="168" fill="#eaf0e4"/>
+            <path d="M0,0 h130 v46 q-65,20 -130,6 Z" fill="#d8e6c4"/>
+            <circle cx="340" cy="126" r="58" fill="#d8e6c4"/>
+            <path d="M-10,116 C60,106 92,148 165,138 C235,128 262,168 410,146 L410,180 L-10,180 Z" fill="#bcd6e8"/>
+            <g stroke="#cfd4cf" stroke-width="10" fill="none"><path d="M-10,58 H410"/><path d="M128,-10 V180"/><path d="M36,182 L205,44 L410,84"/></g>
+            <g stroke="#ffffff" stroke-width="5" fill="none"><path d="M-10,58 H410"/><path d="M128,-10 V180"/><path d="M36,182 L205,44 L410,84"/></g>
+            <path d="M-10,98 H410" stroke="#f0cf83" stroke-width="7" fill="none"/>
+            <path d="M-10,98 H410" stroke="#e0ad3f" stroke-width="7" stroke-dasharray="1 15" fill="none"/>
+          </svg>
+          <span class="pin"><svg viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7Z" fill="var(--brand-1)" stroke="#fff" stroke-width="1.5"/><circle cx="12" cy="9" r="2.6" fill="#fff"/></svg></span>
+          <span class="maptag">map preview &mdash; wire to live map</span>
+        </div>
+      </div>
+
+
+      <!-- ===== ACADEMICS ===== -->
+      <div class="sec-h"><span class="dot"></span>Academics</div>
+      <div class="grid">
+
+        <div class="cell expandable" style="--d:.02s">
+          <button class="cell-btn js-expand" aria-expanded="false"><span class="accent"></span>
+            <span class="cell-top"><span class="ico"><svg viewBox="0 0 24 24"><path d="M12 4 2 9l10 5 10-5-10-5Z"/><path d="M6 11v5c0 1 2.7 2.5 6 2.5s6-1.5 6-2.5v-5"/></svg></span><span class="label">GPA</span></span>
+            <span class="value">4.00</span>
+            <span class="toggle"><svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg></span>
+          </button>
+          <div class="cell-panel"><div><p class="desc">Average unweighted GPA of admitted students &mdash; a benchmark for where you&rsquo;ll be a competitive academic applicant.</p></div></div>
+        </div>
+
+        <div class="cell expandable" style="--d:.06s">
+          <button class="cell-btn js-expand" aria-expanded="false"><span class="accent"></span>
+            <span class="cell-top"><span class="ico"><svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 7h6M9 11h6M9 15h3"/></svg></span><span class="label">SAT Math</span></span>
+            <span class="value">610&ndash;720</span>
+            <span class="toggle"><svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg></span>
+          </button>
+          <div class="cell-panel"><div><p class="desc">The middle 50% (25th&ndash;75th percentile) SAT Math range of admitted students. Land in or above this band to be competitive.</p></div></div>
+        </div>
+
+        <div class="cell expandable" style="--d:.10s">
+          <button class="cell-btn js-expand" aria-expanded="false"><span class="accent"></span>
+            <span class="cell-top"><span class="ico"><svg viewBox="0 0 24 24"><path d="M4 5c3-1 5-1 8 1 3-2 5-2 8-1v13c-3-1-5-1-8 1-3-2-5-2-8-1V5Z"/><path d="M12 7v11"/></svg></span><span class="label">SAT Reading</span></span>
+            <span class="value">610&ndash;690</span>
+            <span class="toggle"><svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg></span>
+          </button>
+          <div class="cell-panel"><div><p class="desc">The middle 50% SAT Reading &amp; Writing range of admitted students &mdash; your target zone for a strong application.</p></div></div>
+        </div>
+
+        <div class="cell expandable" style="--d:.14s">
+          <button class="cell-btn js-expand" aria-expanded="false"><span class="accent"></span>
+            <span class="cell-top"><span class="ico"><svg viewBox="0 0 24 24"><path d="m4 20 3-1 9.5-9.5a2 2 0 0 0-3-3L4 16l-1 4Z"/><path d="M14 6l3 3"/></svg></span><span class="label">ACT</span></span>
+            <span class="value">26&ndash;32</span>
+            <span class="toggle"><svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg></span>
+          </button>
+          <div class="cell-panel"><div><p class="desc">The middle 50% composite ACT range of admitted students. Scoring in this band keeps academics from being a barrier to admission.</p></div></div>
+        </div>
+
+      </div>
+
+      <!-- ===== RECRUITING FIT ===== -->
+      <div class="sec-h"><span class="dot"></span>Recruiting Fit</div>
+      <div class="grid">
+
+        <div class="cell expandable hero-cell span2" style="--d:.02s">
+          <button class="cell-btn js-expand" aria-expanded="false"><span class="accent"></span>
+            <span class="hero-left">
+              <span class="cell-top"><span class="ico"><svg viewBox="0 0 24 24"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8Z"/></svg></span><span class="label">Power Score</span></span>
+              <span class="value">92<span class="unit">/100</span></span>
+              <span class="tagline">Strong fit</span>
+            </span>
+            <span class="ring"><svg viewBox="0 0 84 84"><circle class="track" cx="42" cy="42" r="36"/><circle class="prog" cx="42" cy="42" r="36"/></svg><span class="rnum">92</span></span>
+            <span class="toggle"><svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg></span>
+          </button>
+          <div class="cell-panel"><div><p class="desc">Our proprietary 0&ndash;100 rating of how strong a fit this program is for you &mdash; blending athletic level, academic match, cost, and roster need into one number. The higher the score, the better the all-around opportunity.</p></div></div>
+        </div>
+
+        <div class="cell expandable" style="--d:.08s">
+          <button class="cell-btn js-expand" aria-expanded="false"><span class="accent"></span>
+            <span class="cell-top"><span class="ico"><svg viewBox="0 0 24 24"><path d="M12 3l2.5 5 5.5.8-4 3.9.9 5.5L12 21l-4.9 2.6.9-5.5-4-3.9L9.5 8 12 3Z"/></svg></span><span class="label">Coach Grade</span></span>
+            <span class="value">A&minus;</span>
+            <span class="toggle"><svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg></span>
+          </button>
+          <div class="cell-panel"><div><p class="desc">A composite grade for the coaching staff based on player development, retention, tenure, and athlete feedback &mdash; how well this staff grows the players they bring in.</p></div></div>
+        </div>
+
+        <div class="cell expandable" style="--d:.12s">
+          <button class="cell-btn js-expand" aria-expanded="false"><span class="accent"></span>
+            <span class="cell-top"><span class="ico"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3 2.7-5 6-5s6 2 6 5"/><path d="M16 5a3 3 0 0 1 0 6M21 20c0-2.5-1.7-4.3-4-4.8"/></svg></span><span class="label">Roster Spots</span></span>
+            <span class="value">3<span class="unit">open</span></span>
+            <span class="toggle"><svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg></span>
+          </button>
+          <div class="cell-panel"><div><p class="desc">Estimated openings at your position for the upcoming class, based on the current roster, graduating seniors, and typical class size. More spots means a clearer path to playing time.</p></div></div>
+        </div>
+
+        <div class="cell expandable span2" style="--d:.16s">
+          <button class="cell-btn js-expand" aria-expanded="false"><span class="accent"></span>
+            <span class="cell-top"><span class="ico"><svg viewBox="0 0 24 24"><path d="M12 4 3 20h18L12 4Z"/><path d="M12 10v10"/></svg></span><span class="label">Camps</span></span>
+            <span class="value">4<span class="unit">upcoming</span></span>
+            <span class="toggle"><svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg></span>
+          </button>
+          <div class="cell-panel"><div><p class="desc">Upcoming prospect camps and ID clinics hosted by this program &mdash; one of the fastest ways to get seen by the staff in person.
+            <a class="panel-link" href="#" target="_blank" rel="noopener">View dates &amp; register <svg viewBox="0 0 24 24" fill="none"><path d="M7 17 17 7M9 7h8v8" stroke-linecap="round" stroke-linejoin="round"/></svg></a></p></div></div>
+        </div>
+
+      </div>
+
+      <!-- ===== ADMISSIONS ===== -->
+      <div class="sec-h"><span class="dot"></span>Admissions</div>
+      <div class="rows">
+        <div class="row"><span class="k">Acceptance Rate</span><span class="v">34.51%</span></div>
+        <div class="row"><span class="k">Yearly Cost</span><span class="v">$44,743</span></div>
+        <div class="row"><span class="k">US News Ranking</span><span class="v">#&ndash;</span></div>
+      </div>
+
+      <!-- ===== EXPLORE (buttons) ===== -->
+      <div class="sec-h"><span class="dot"></span>Explore</div>
+      <div class="btns">
+
+        <div class="expandable" style="--d:.02s">
+          <button class="btn btn--outline js-expand" aria-expanded="false">
+            <span class="btn-ico"><svg viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 12h16M4 18h10" stroke-linecap="round"/></svg></span>
+            <span class="btn-txt">View Majors</span>
+            <span class="btn-end"><svg viewBox="0 0 24 24" fill="none"><path d="m6 9 6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          </button>
+          <div class="btn-panel"><div><div class="panel-body">
+            <div class="chips">
+              <span class="chip">Business Admin</span><span class="chip">Mechanical Eng</span>
+              <span class="chip">Kinesiology</span><span class="chip">Computer Science</span>
+              <span class="chip">Agribusiness</span><span class="chip">Communication</span><span class="chip">Architecture</span>
+            </div>
+            <a class="panel-link" href="#" target="_blank" rel="noopener">See all 100+ majors <svg viewBox="0 0 24 24" fill="none"><path d="M7 17 17 7M9 7h8v8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+          </div></div></div>
+        </div>
+
+        <a class="btn btn--dark" href="#" target="_blank" rel="noopener" style="--d:.06s">
+          <span class="btn-ico"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.7 3 2.7 15 0 18M12 3c-2.7 3-2.7 15 0 18" stroke-width="1.6"/></svg></span>
+          <span class="btn-txt">Team Website</span>
+          <span class="btn-end"><svg viewBox="0 0 24 24" fill="none"><path d="M7 17 17 7M9 7h8v8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        </a>
+
+        <a class="btn btn--accent" href="#" target="_blank" rel="noopener" style="--d:.08s">
+          <span class="btn-ico"><svg viewBox="0 0 24 24" fill="none"><path d="M4 4h16v12H8l-4 4V4Z"/></svg></span>
+          <span class="btn-txt">Message a Coach</span>
+          <span class="btn-end"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        </a>
+
+        <div class="socials">
+          <a class="icon-btn" href="#" target="_blank" rel="noopener" aria-label="X / Twitter" style="--d:.10s"><svg viewBox="0 0 24 24"><path d="M18.9 2H22l-7.1 8.1L23 22h-6.6l-5.2-6.8L5.3 22H2l7.6-8.7L1.5 2h6.7l4.7 6.2L18.9 2Zm-2.3 18h1.8L7.5 3.9H5.6L16.6 20Z"/></svg></a>
+          <a class="icon-btn" href="#" target="_blank" rel="noopener" aria-label="Instagram" style="--d:.14s"><svg viewBox="0 0 24 24"><path d="M12 2.9c3 0 3.3 0 4.5.07 1.1.05 1.7.24 2.1.4.5.2.9.46 1.3.85.4.4.65.8.85 1.3.16.4.35 1 .4 2.1.07 1.2.07 1.5.07 4.5s0 3.3-.07 4.5c-.05 1.1-.24 1.7-.4 2.1-.2.5-.46.9-.85 1.3-.4.4-.8.65-1.3.85-.4.16-1 .35-2.1.4-1.2.07-1.5.07-4.5.07s-3.3 0-4.5-.07c-1.1-.05-1.7-.24-2.1-.4a3.5 3.5 0 0 1-1.3-.85 3.5 3.5 0 0 1-.85-1.3c-.16-.4-.35-1-.4-2.1C2.9 15.3 2.9 15 2.9 12s0-3.3.07-4.5c.05-1.1.24-1.7.4-2.1.2-.5.46-.9.85-1.3.4-.4.8-.65 1.3-.85.4-.16 1-.35 2.1-.4C8.7 2.9 9 2.9 12 2.9Zm0 1.8c-2.9 0-3.2 0-4.4.07-.9.04-1.4.2-1.7.32-.43.17-.73.37-1.05.7-.32.31-.52.61-.69 1.04-.12.3-.28.8-.32 1.7C3.77 8.8 3.77 9.1 3.77 12s0 3.2.07 4.4c.04.9.2 1.4.32 1.7.17.43.37.73.7 1.05.31.32.61.52 1.04.69.3.12.8.28 1.7.32 1.2.06 1.5.07 4.4.07s3.2 0 4.4-.07c.9-.04 1.4-.2 1.7-.32.43-.17.73-.37 1.05-.7.32-.31.52-.61.69-1.04.12-.3.28-.8.32-1.7.06-1.2.07-1.5.07-4.4s0-3.2-.07-4.4c-.04-.9-.2-1.4-.32-1.7a2.8 2.8 0 0 0-.7-1.05 2.8 2.8 0 0 0-1.04-.69c-.3-.12-.8-.28-1.7-.32-1.2-.06-1.5-.07-4.4-.07Zm0 3.1a4.2 4.2 0 1 1 0 8.4 4.2 4.2 0 0 1 0-8.4Zm0 6.9a2.7 2.7 0 1 0 0-5.4 2.7 2.7 0 0 0 0 5.4Zm5.3-7.1a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z"/></svg></a>
+          <span style="flex:1"></span>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+
+<script>
+/* ---- expand hook (cells + buttons) ---- */
+document.querySelectorAll('.js-expand').forEach(function (btn) {
+  btn.addEventListener('click', function () {
+    var box = btn.closest('.expandable');
+    if (!box) return;
+    var open = box.classList.toggle('open');
+    btn.setAttribute('aria-expanded', String(open));
+  });
+});
+
+/* ---- theme engine: readable text on any brand color ---- */
+function hexToRgb(h){ h=h.replace('#',''); if(h.length===3){h=h.split('').map(function(c){return c+c;}).join('');}
+  return {r:parseInt(h.slice(0,2),16), g:parseInt(h.slice(2,4),16), b:parseInt(h.slice(4,6),16)}; }
+function lum(h){ var c=hexToRgb(h); var a=[c.r,c.g,c.b].map(function(v){ v/=255; return v<=.03928? v/12.92 : Math.pow((v+.055)/1.055,2.4); });
+  return .2126*a[0]+.7152*a[1]+.0722*a[2]; }
+function onColor(h){ return lum(h) > 0.40 ? '#16181d' : '#ffffff'; }
+
+function applyTheme(el, c1, c2){
+  el.style.setProperty('--brand-1', c1);
+  el.style.setProperty('--brand-2', c2);
+  el.style.setProperty('--on-1', onColor(c1));
+  el.style.setProperty('--on-2', onColor(c2));
+}
+/* demo switcher — swaps colors + logo + name + city so it fully re-skins */
+var profile = document.getElementById('profile');
+var logoImg = document.getElementById('schoolLogo');
+var logoMono = document.getElementById('schoolMono');
+logoImg.onerror = function(){ logoImg.style.display='none'; logoMono.style.display='grid'; };
+function setLogo(url, mono){
+  logoMono.textContent = mono || '';
+  if (url){ logoImg.src = url; logoImg.style.display=''; logoMono.style.display='none'; }
+  else { logoImg.style.display='none'; logoMono.style.display='grid'; }
+}
+document.querySelectorAll('.switcher .sw').forEach(function (b) {
+  b.addEventListener('click', function () {
+    applyTheme(profile, b.dataset.c1, b.dataset.c2);
+    setLogo(b.dataset.logo, b.dataset.mono);
+    document.getElementById('schoolName').innerHTML = b.dataset.name;
+    document.getElementById('schoolSub').innerHTML = '<span class="pin"></span>' + b.dataset.loc;
+    document.getElementById('schoolAddr').textContent = b.dataset.addr;
+  });
+});
+</script>
+</body>
+</html>
