@@ -49,11 +49,14 @@
   --r:20px; }
 
 *{box-sizing:border-box;}
+html{ overflow-x:hidden; }
 /* White canvas with Athlete Narrative green paint streaks framing the edges (like the original) */
-body{ margin:0; background:#ffffff;
+body{ margin:0; background:#ffffff; overflow-x:hidden;
   color:var(--text); font-family:"Archivo",system-ui,-apple-system,"Segoe UI",sans-serif;
-  -webkit-font-smoothing:antialiased; line-height:1.5; padding:22px 34px 70px; }
-.paint{ position:fixed; top:0; bottom:0; width:19vw; min-width:92px; max-width:240px; z-index:0; pointer-events:none; }
+  -webkit-font-smoothing:antialiased; line-height:1.5; padding:22px 0 70px; }
+.paint{ position:fixed; top:0; bottom:0; width:13vw; min-width:56px; max-width:170px; z-index:0; pointer-events:none; opacity:.85;
+  -webkit-mask-image:linear-gradient(90deg,#000 34%,transparent 94%);
+          mask-image:linear-gradient(90deg,#000 34%,transparent 94%); }
 .paint.l{ left:0; }
 .paint.r{ right:0; transform:scaleX(-1); }
 .paint svg{ width:100%; height:100%; display:block; }
@@ -62,7 +65,7 @@ body{ margin:0; background:#ffffff;
 h1{font-weight:900; letter-spacing:-.025em; line-height:1.03; margin:0;}
 
 /* ---- demo school switcher (delete on integration) ---- */
-.switcher{ max-width:432px; margin:0 auto 16px; display:flex; flex-wrap:wrap; gap:7px; align-items:center;
+.switcher{ width:calc(100% - 52px); max-width:414px; margin:0 auto 16px; display:flex; flex-wrap:wrap; gap:7px; align-items:center;
   background:#fff; border:1px solid #e3e6ea; border-radius:14px; padding:11px 13px; box-shadow:var(--shadow-sm); }
 .switcher .lbl{ font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.12em; color:var(--muted); margin-right:2px; }
 .sw{ border:0; cursor:pointer; font-family:inherit; font-weight:800; font-size:12px; color:#fff;
@@ -71,7 +74,7 @@ h1{font-weight:900; letter-spacing:-.025em; line-height:1.03; margin:0;}
 .sw i{ width:10px;height:10px;border-radius:50%; display:inline-block; border:1.5px solid rgba(255,255,255,.7); }
 
 /* ---- preview phone frame ---- */
-.frame{ max-width:432px; margin:0 auto; background:#fff; border-radius:34px;
+.frame{ width:calc(100% - 52px); max-width:414px; margin:0 auto; background:#fff; border-radius:34px;
   box-shadow:var(--shadow); overflow:hidden; position:relative; isolation:isolate; }
 
 /* ============================================================
@@ -141,13 +144,13 @@ h1{font-weight:900; letter-spacing:-.025em; line-height:1.03; margin:0;}
 
 .cell-btn{ width:100%; text-align:left; background:none; border:0; cursor:pointer;
   padding:16px 16px 15px; font-family:inherit; color:var(--text); display:block; }
-.cell-top{ display:flex; align-items:center; gap:9px; }
+.cell-top{ display:flex; align-items:center; gap:9px; padding-right:26px; }  /* reserve room for the + toggle */
 .cell .ico{ width:30px;height:30px;border-radius:9px;flex:0 0 auto; background:var(--chip);
   display:grid;place-items:center; transition:background .25s,transform .25s; }
 .cell .ico svg{ width:17px;height:17px; stroke:var(--b1-text); stroke-width:2; fill:none; }
 .cell:hover .ico, .cell.open .ico{ background:var(--brand-1); transform:rotate(-4deg); }
 .cell:hover .ico svg, .cell.open .ico svg{ stroke:var(--brand-2); }
-.cell .label{ font-size:13.5px; font-weight:800; letter-spacing:-.01em; color:#2b2f36; }
+.cell .label{ font-size:13.5px; font-weight:800; letter-spacing:-.01em; color:#2b2f36; min-width:0; }
 .cell .value{ display:block; font-size:26px; font-weight:900; letter-spacing:-.03em;
   color:var(--b1-text); margin-top:12px; line-height:1; }
 .cell .value.value-sm{ font-size:17px; margin-top:15px; letter-spacing:0; }
@@ -186,8 +189,8 @@ h1{font-weight:900; letter-spacing:-.025em; line-height:1.03; margin:0;}
 /* compact gauge used inside a stat cell */
 .ring--sm{ width:78px;height:78px; }
 .ring--sm .rnum{ font-size:19px; }
-.ring--md{ width:98px;height:98px; }
-.ring--md .rnum{ font-size:30px; }
+.ring--md{ width:88px;height:88px; }
+.ring--md .rnum{ font-size:27px; }
 .gauge{ display:flex; flex-direction:column; align-items:center; gap:7px; padding:12px 0 4px; }
 /* WHOOP-style score cell: uniform ring + "out of 100" */
 .score .cell-btn{ padding-bottom:16px; }
@@ -268,6 +271,12 @@ h1{font-weight:900; letter-spacing:-.025em; line-height:1.03; margin:0;}
 
 @keyframes rise{ from{opacity:0; transform:translateY(16px);} to{opacity:1; transform:none;} }
 @media (prefers-reduced-motion:reduce){ *{animation:none !important; transition:none !important;} }
+/* small phones: keep the 2-col grid + rings comfortably inside the card */
+@media (max-width:360px){
+  .pad{ padding-left:14px; padding-right:14px; }
+  .cell-btn{ padding:14px 13px 13px; }
+  .ring--md{ width:78px;height:78px; } .ring--md .rnum{ font-size:24px; }
+}
 
 /* dev note */
 .devnote{ max-width:432px; margin:20px auto 0; font-size:12.5px; color:#6b7280;
